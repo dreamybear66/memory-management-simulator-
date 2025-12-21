@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Memory Management Simulator</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- External Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- ================= LEFT PANEL ================= -->
+  <div class="panel controls">
+    <h2>Controls</h2>
+
+    <label>Allocation Algorithm</label>
+    <select id="algorithm">
+      <option value="first">First Fit</option>
+      <option value="next">Next Fit</option>
+      <option value="best">Best Fit</option>
+      <option value="worst">Worst Fit</option>
+    </select>
+
+    <label>Process ID</label>
+    <input id="pid" placeholder="e.g., P1" />
+
+    <label>Memory Size (KB)</label>
+    <input id="size" type="number" placeholder="e.g., 300" />
+
+    <button class="btn green" onclick="allocateProcess()">Allocate</button>
+    <button class="btn red" onclick="deallocateProcess()">Deallocate</button>
+    <button class="btn blue" onclick="compactMemory()">Compact Memory</button>
+    <button class="btn olive" onclick="resetMemory()">Reset Memory</button>
+
+    <hr />
+
+    <h3>Simulation Controls</h3>
+    <button class="btn blue" onclick="playSimulation()">▶ Play</button>
+    <button class="btn red" onclick="pauseSimulation()">⏸ Pause</button>
+    <button class="btn olive" onclick="exportPDF()">📄 Export PDF</button>
+
+    <hr />
+
+    <h3>Predefined Processes</h3>
+    <p style="font-size: 13px; color: #555;">
+      Click to auto-allocate predefined processes<br>
+      (useful for comparing algorithms)
+    </p>
+
+    <button class="btn green" onclick="loadPredefinedProcesses()">
+      Load Sample Processes
+    </button>
+  </div>
+
+  <!-- ================= RIGHT PANEL ================= -->
+  <div class="panel right">
+
+    <!-- MEMORY -->
+    <div class="memory-panel">
+      <h2>Memory Layout (Total: 10240 KB)</h2>
+      <div id="memory"></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-panel">
+      <h2>Statistics</h2>
+      <div class="stats-grid" id="stats"></div>
+    </div>
+
+    <!-- FRAGMENTATION GRAPH -->
+    <div class="chart-panel">
+      <h2>Fragmentation Over Time</h2>
+      <canvas id="fragChart" height="120"></canvas>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="js/memory.js"></script>
+<script src="js/algorithms.js"></script>
+<script src="js/operations.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/playback.js"></script>
+<script src="js/export.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+
+<!-- ================= PREDEFINED PROCESS LOGIC ================= -->
+<script>
+  function loadPredefinedProcesses() {
+    resetMemory();
+
+    const processes = [
+      { pid: "P1", size: 212 },
+      { pid: "P2", size: 417 },
+      { pid: "P3", size: 112 },
+      { pid: "P4", size: 426 },
+      { pid: "P5", size: 95 },
+      { pid: "P6", size: 320 }
+    ];
+
+    let index = 0;
+
+    function allocateNext() {
+      if (index >= processes.length) return;
+
+      document.getElementById("pid").value = processes[index].pid;
+      document.getElementById("size").value = processes[index].size;
+
+      allocateProcess();
+      index++;
+
+      setTimeout(allocateNext, 800);
+    }
+
+    allocateNext();
+  }
+</script>
+
+</body>
+</html>
