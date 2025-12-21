@@ -2,11 +2,9 @@ function render() {
   renderMemory();
   renderStats();
 
-  if (typeof steps !== "undefined") {
-    const stats = calculateStats();
-    updateChart(steps.length, stats.externalFrag);
-  }
+
 }
+
 
 function renderMemory() {
   const mem = document.getElementById("memory");
@@ -29,15 +27,43 @@ function renderMemory() {
 
 function renderStats() {
   const s = calculateStats();
+
+  const usedPercent = ((s.used / s.total) * 100).toFixed(2);
+  const freePercent = ((s.free / s.total) * 100).toFixed(2);
+
+  // External fragmentation % relative to total free memory
+  const externalFragPercent = s.free > 0
+    ? ((s.externalFrag / s.free) * 100).toFixed(2)
+    : "0.00";
+
   document.getElementById("stats").innerHTML = `
-    <div class="stat">Total<br>${s.total} KB</div>
-    <div class="stat">Used<br>${s.used} KB</div>
-    <div class="stat">Free<br>${s.free} KB</div>
-    <div class="stat">Active<br>${s.active}</div>
-    <div class="stat red">External Frag<br>${s.externalFrag}</div>
-    <div class="stat">Largest Free<br>${s.largestFree}</div>
+    <div class="stat">
+      Total<br>${s.total} KB
+    </div>
+
+    <div class="stat">
+      Used<br>${s.used} KB<br>(${usedPercent}%)
+    </div>
+
+    <div class="stat">
+      Free<br>${s.free} KB<br>(${freePercent}%)
+    </div>
+
+    <div class="stat">
+      Active<br>${s.active}
+    </div>
+
+    <div class="stat red">
+      External Frag<br>${s.externalFrag} KB<br>
+      (${externalFragPercent}% of free)
+    </div>
+
+    <div class="stat">
+      Largest Free<br>${s.largestFree} KB
+    </div>
   `;
 }
+
 
 function highlightBlock(index) {
   const blocks = document.querySelectorAll(".block");
@@ -47,3 +73,9 @@ function highlightBlock(index) {
     blocks[index].style.outline = "3px solid yellow";
   }
 }
+
+// Initialize chart on page load
+document.addEventListener("DOMContentLoaded", () => {
+  initChart();
+  render();
+});

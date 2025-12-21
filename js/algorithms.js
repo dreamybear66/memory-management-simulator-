@@ -1,13 +1,18 @@
+/* ================================
+   HELPER: Allocate Block
+================================ */
 function allocateBlock(index, pid, size) {
   const block = memory[index];
   const remaining = block.size - size;
 
+  // Replace free block with allocated block
   memory.splice(index, 1, {
-    size,
+    size: size,
     free: false,
-    pid
+    pid: pid
   });
 
+  // Insert remaining free block if any
   if (remaining > 0) {
     memory.splice(index + 1, 0, {
       size: remaining,
@@ -17,16 +22,22 @@ function allocateBlock(index, pid, size) {
   }
 }
 
-/* ================= FIRST FIT ================= */
+/* ================================
+   FIRST FIT
+================================ */
 function firstFit(pid, size) {
   for (let i = 0; i < memory.length; i++) {
     if (memory[i].free && memory[i].size >= size) {
+
       highlightBlock(i);
 
       setTimeout(() => {
         allocateBlock(i, pid, size);
         render();
-      }, 600);
+
+        const stats = calculateStats();
+        updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+      }, 500);
 
       return true;
     }
@@ -34,19 +45,31 @@ function firstFit(pid, size) {
   return false;
 }
 
-/* ================= NEXT FIT ================= */
+/* ================================
+   NEXT FIT (FIXED)
+================================ */
 function nextFit(pid, size) {
   const n = memory.length;
   let count = 0;
 
   while (count < n) {
     if (memory[lastIndex].free && memory[lastIndex].size >= size) {
-      highlightBlock(lastIndex);
+
+      const allocIndex = lastIndex; // preserve index
+      highlightBlock(allocIndex);
 
       setTimeout(() => {
-        allocateBlock(lastIndex, pid, size);
+        allocateBlock(allocIndex, pid, size);
+
+        // ✅ UPDATE lastIndex AFTER allocation
+        lastIndex = allocIndex + 1;
+        if (lastIndex >= memory.length) lastIndex = 0;
+
         render();
-      }, 600);
+
+        const stats = calculateStats();
+        updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+      }, 500);
 
       return true;
     }
@@ -54,10 +77,13 @@ function nextFit(pid, size) {
     lastIndex = (lastIndex + 1) % n;
     count++;
   }
+
   return false;
 }
 
-/* ================= BEST FIT ================= */
+/* ================================
+   BEST FIT
+================================ */
 function bestFit(pid, size) {
   let bestIndex = -1;
   let minDiff = Infinity;
@@ -78,14 +104,20 @@ function bestFit(pid, size) {
     setTimeout(() => {
       allocateBlock(bestIndex, pid, size);
       render();
-    }, 600);
+
+      const stats = calculateStats();
+      updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+    }, 500);
 
     return true;
   }
+
   return false;
 }
 
-/* ================= WORST FIT ================= */
+/* ================================
+   WORST FIT
+================================ */
 function worstFit(pid, size) {
   let worstIndex = -1;
   let maxSize = -1;
@@ -105,9 +137,13 @@ function worstFit(pid, size) {
     setTimeout(() => {
       allocateBlock(worstIndex, pid, size);
       render();
-    }, 600);
+
+      const stats = calculateStats();
+      updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+    }, 500);
 
     return true;
   }
+
   return false;
 }

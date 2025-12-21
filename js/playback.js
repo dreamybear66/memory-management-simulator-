@@ -1,26 +1,43 @@
 let steps = [];
 let stepIndex = 0;
 let playing = false;
+let playInterval = null;
 
 function recordStep() {
   steps.push(JSON.parse(JSON.stringify(memory)));
 }
 
 function playSimulation() {
-  if (playing) return;
-  playing = true;
+  if (playing || steps.length === 0) return;
 
-  const interval = setInterval(() => {
+  playing = true;
+  stepIndex = 0;
+
+  // Reset graph before playback
+  if (typeof fragChart !== "undefined") {
+    fragChart.data.labels = [];
+    fragChart.data.datasets[0].data = [];
+    fragChart.update();
+  }
+
+  playInterval = setInterval(() => {
     if (stepIndex >= steps.length) {
-      clearInterval(interval);
-      playing = false;
+      pauseSimulation();
       return;
     }
-    memory = steps[stepIndex++];
+
+    memory = JSON.parse(JSON.stringify(steps[stepIndex]));
     render();
+
+    // 🔥 UPDATE GRAPH DURING PLAYBACK
+    const stats = calculateStats();
+    updateChart(stepIndex + 1, stats.externalFrag);
+
+    stepIndex++;
   }, 700);
 }
 
 function pauseSimulation() {
   playing = false;
+  clearInterval(playInterval);
 }

@@ -1,22 +1,31 @@
 function calculateStats() {
-  let used = 0, free = 0, internal = 0, active = 0;
+  let used = 0;
+  let free = 0;
+  let active = 0;
+  let freeBlocks = [];
 
-  memory.forEach(b => {
-    if (b.free) free += b.size;
-    else {
-      used += b.size;
+  memory.forEach(block => {
+    if (block.free) {
+      free += block.size;
+      freeBlocks.push(block.size);
+    } else {
+      used += block.size;
       active++;
-      if (b.internal) internal += b.internal;
     }
   });
+
+  const largestFree = freeBlocks.length
+    ? Math.max(...freeBlocks)
+    : 0;
+
+  const externalFrag = free - largestFree;
 
   return {
     total: TOTAL_MEMORY,
     used,
     free,
     active,
-    externalFrag: free,
-    internalFrag: internal,
-    largestFree: Math.max(...memory.filter(b => b.free).map(b => b.size), 0)
+    largestFree,
+    externalFrag
   };
 }

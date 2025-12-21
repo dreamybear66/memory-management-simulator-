@@ -1,5 +1,4 @@
 let fragChart;
-let fragData = [];
 
 function initChart() {
   const ctx = document.getElementById("fragChart").getContext("2d");
@@ -13,6 +12,12 @@ function initChart() {
         data: [],
         borderWidth: 2
       }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
     }
   });
 }
