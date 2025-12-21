@@ -13,15 +13,13 @@ function playSimulation() {
   playing = true;
   stepIndex = 0;
 
-  // Reset graph before playback
-  if (typeof fragChart !== "undefined") {
-    fragChart.data.labels = [];
-    fragChart.data.datasets[0].data = [];
-    fragChart.update();
-  }
+  // Reset graph
+  fragChart.data.labels = [];
+  fragChart.data.datasets[0].data = [];
+  fragChart.update();
 
   playInterval = setInterval(() => {
-    if (stepIndex >= steps.length) {
+    if (stepIndex === steps.length) {
       pauseSimulation();
       return;
     }
@@ -29,7 +27,6 @@ function playSimulation() {
     memory = JSON.parse(JSON.stringify(steps[stepIndex]));
     render();
 
-    // 🔥 UPDATE GRAPH DURING PLAYBACK
     const stats = calculateStats();
     updateChart(stepIndex + 1, stats.externalFrag);
 

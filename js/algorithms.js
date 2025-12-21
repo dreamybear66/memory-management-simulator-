@@ -37,6 +37,10 @@ function firstFit(pid, size) {
 
         const stats = calculateStats();
         updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+
+        // ✅ RECORD FINAL STATE AFTER ALLOCATION
+        recordStep();
+
       }, 500);
 
       return true;
@@ -44,6 +48,7 @@ function firstFit(pid, size) {
   }
   return false;
 }
+
 
 /* ================================
    NEXT FIT (FIXED)
@@ -69,6 +74,9 @@ function nextFit(pid, size) {
 
         const stats = calculateStats();
         updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+
+        // ✅ RECORD FINAL STATE AFTER ALLOCATION
+        recordStep();
       }, 500);
 
       return true;
@@ -107,6 +115,9 @@ function bestFit(pid, size) {
 
       const stats = calculateStats();
       updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+
+      // ✅ RECORD FINAL STATE AFTER ALLOCATION
+        recordStep();
     }, 500);
 
     return true;
@@ -140,6 +151,10 @@ function worstFit(pid, size) {
 
       const stats = calculateStats();
       updateChart(fragChart.data.labels.length + 1, stats.externalFrag);
+
+      // ✅ RECORD FINAL STATE AFTER ALLOCATION
+        recordStep();
+        
     }, 500);
 
     return true;
