@@ -1,8 +1,7 @@
 function render() {
   renderMemory();
   renderStats();
-
-
+  updateAlgorithmDescription();
 }
 
 
@@ -12,10 +11,17 @@ function renderMemory() {
 
   memory.forEach(b => {
     const div = document.createElement("div");
-    div.className = `block ${b.free ? "free" : "used"}`;
+    
+    // Add class based on allocation type
+    if (b.free) {
+      div.className = "block free";
+    } else {
+      div.className = `block used allocated-${b.allocatedBy || 'sample'}`;
+    }
 
-    // VERTICAL MEMORY (correct)
-    div.style.height = `${(b.size / TOTAL_MEMORY) * 100}%`;
+    // HORIZONTAL GANTT CHART - Calculate width based on memory proportion
+    const widthPercent = (b.size / TOTAL_MEMORY) * 100;
+    div.style.width = `${widthPercent}%`;
 
     div.innerHTML = b.free
       ? `FREE<br>${b.size} KB`
@@ -74,8 +80,39 @@ function highlightBlock(index) {
   }
 }
 
+// Algorithm Descriptions
+const algorithmDescriptions = {
+  first: {
+    name: "First Fit",
+    description: "Allocates memory to the first free block that is large enough. Simple and fast, but may leave small fragments."
+  },
+  next: {
+    name: "Next Fit",
+    description: "Starts searching from the last allocation point instead of the beginning. Reduces search time and distributes fragmentation more evenly."
+  },
+  best: {
+    name: "Best Fit",
+    description: "Finds the smallest free block that can fit the process. Minimizes wasted space and reduces fragmentation, but slower search."
+  },
+  worst: {
+    name: "Worst Fit",
+    description: "Allocates to the largest available free block. Leaves the remaining space large, but may cause severe external fragmentation."
+  }
+};
+
+function updateAlgorithmDescription() {
+  const algo = document.getElementById("algorithm").value;
+  const descDiv = document.getElementById("algorithmDescription");
+  
+  if (algorithmDescriptions[algo]) {
+    const desc = algorithmDescriptions[algo];
+    descDiv.innerHTML = `<strong>${desc.name}:</strong> ${desc.description}`;
+  }
+}
+
 // Initialize chart on page load
 document.addEventListener("DOMContentLoaded", () => {
   initChart();
   render();
+  updateAlgorithmDescription();
 });

@@ -14,6 +14,8 @@
 
 <body>
 
+<h1 class="project-title">MEMORY MANAGEMENT SIMULATOR</h1>
+
 <div class="container">
 
   <!-- ================= LEFT PANEL ================= -->
@@ -24,7 +26,7 @@
 
     <!-- 🔹 ALGORITHM -->
     <label>Allocation Algorithm</label>
-    <select id="algorithm">
+    <select id="algorithm" onchange="updateAlgorithmDescription()">
       <option value="first">First Fit</option>
       <option value="next">Next Fit</option>
       <option value="best">Best Fit</option>
@@ -68,8 +70,75 @@
 
     <!-- MEMORY -->
     <div class="memory-panel">
-      <h2>Memory Layout (Total: 10240 KB)</h2>
-      <div id="memory"></div>
+      <h2>Memory Layout (Gantt Chart) - Total: 10240 KB</h2>
+      <div class="gantt-wrapper">
+        <div class="gantt-ruler">
+          <div class="ruler-label">0 KB</div>
+          <div class="ruler-label">2560 KB</div>
+          <div class="ruler-label">5120 KB</div>
+          <div class="ruler-label">7680 KB</div>
+          <div class="ruler-label">10240 KB</div>
+        </div>
+        <div id="memory" class="gantt-chart"></div>
+      </div>
+
+      <!-- LEGEND -->
+      <div class="legend-section">
+        <div class="legend-title">Color Legend:</div>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e);"></div>
+            <span>First Fit</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #4a90e2, #6ba3f5);"></div>
+            <span>Next Fit</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #7ed321, #a0e41e);"></div>
+            <span>Best Fit</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #f5a623, #f8b844);"></div>
+            <span>Worst Fit</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: linear-gradient(135deg, #bd10e0, #d946ef);"></div>
+            <span>Preloaded</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #c8cdd0;"></div>
+            <span>Free</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALGORITHM DESCRIPTION -->
+    <div class="algorithm-description-panel">
+      <h3>About Selected Algorithm</h3>
+      <div id="algorithmDescription" class="algorithm-desc-content"></div>
+    </div>
+
+    <!-- COMPARE TAB -->
+    <div class="compare-tab-panel">
+      <h2>Compare Process Allocations</h2>
+      <div class="compare-tab-content">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Enter Process ID to Compare:</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+          <input id="compareProcessId" type="text" placeholder="e.g., P1" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
+          <button class="btn blue" onclick="compareProcessAlgorithms()" style="flex: 0 0 auto; width: 100px; margin-top: 0;">Compare</button>
+        </div>
+        <div id="compareTableContainer"></div>
+      </div>
+    </div>
+
+    <!-- EFFICIENCY COMPARISON -->
+    <div class="efficiency-panel" id="efficiencyPanel" style="display: none;">
+      <h2>Algorithm Efficiency Comparison</h2>
+      <div class="efficiency-content">
+        <div class="efficiency-grid" id="efficiencyGrid"></div>
+      </div>
     </div>
 
     <!-- STATS -->
@@ -96,6 +165,7 @@
 <script src="js/charts.js"></script>
 <script src="js/playback.js"></script>
 <script src="js/export.js"></script>
+<script src="js/compare.js"></script>
 <script src="js/ui.js"></script>
 
 
