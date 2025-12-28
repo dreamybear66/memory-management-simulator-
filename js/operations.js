@@ -1,3 +1,27 @@
+let processQueue = [];
+
+function addQueueEvent(pid, size, algo) {
+  processQueue.unshift({ pid, size, algo, status: 'requested', time: Date.now() });
+  if (typeof render === 'function') render();
+}
+
+function markQueueStatus(pid, status, details) {
+  const idx = processQueue.findIndex(q => q.pid === pid && q.status === 'requested');
+  if (idx !== -1) {
+    processQueue[idx].status = status;
+    processQueue[idx].details = details || null;
+    processQueue[idx].time = Date.now();
+  } else {
+    processQueue.unshift({ pid, size: details && details.size ? details.size : null, algo: details && details.algo ? details.algo : null, status, details, time: Date.now() });
+  }
+  if (typeof render === 'function') render();
+}
+
+function clearQueue() {
+  processQueue.length = 0;
+  if (typeof render === 'function') render();
+}
+
 function allocateProcess() {
   const pid = document.getElementById("pid").value;
   const size = parseInt(document.getElementById("size").value);
@@ -8,6 +32,9 @@ function allocateProcess() {
     alert("Enter valid Process ID and Size");
     return;
   }
+
+  // add to queue
+  addQueueEvent(pid, size, algo);
 
   // ✅ Record state BEFORE allocation (for Play / Playback)
   if (typeof recordStep === "function") {
@@ -40,6 +67,7 @@ function allocateProcess() {
   }
 
   if (!success) {
+    markQueueStatus(pid, 'failed', { reason: 'Not enough memory', size });
     alert("Allocation Failed: Not enough memory");
   }
 }
@@ -70,6 +98,9 @@ function deallocateProcess() {
     alert("Process not found in memory");
     return;
   }
+
+  // record deallocation in queue
+  processQueue.unshift({ pid, size: null, algo: 'deallocate', status: 'deallocated', time: Date.now() });
 
   mergeFreeBlocks();
   render();
