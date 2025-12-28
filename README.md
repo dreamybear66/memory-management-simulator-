@@ -189,7 +189,7 @@ If you have any questions, suggestions, or encounter issues, please use the foll
 
 **⭐ Star this repo if you find it helpful!**
 
-Made with ❤️ by [dreamybear66](https://github.com/dreamybear66)
+Made with ❤️ by [dreamybear66](https://github.com/dreamybear66) and [krish-31](https://github.com/krish-31)
 
 </div>
 
