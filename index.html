@@ -14,6 +14,12 @@
 
 <body>
 
+<header class="app-header" role="banner">
+  <div class="header-inner">
+    <h1>Memory Management Simulator</h1>
+  </div>
+</header>
+
 <div class="container">
 
   <!-- ================= LEFT PANEL ================= -->
@@ -61,6 +67,22 @@
     <button class="btn blue" onclick="playSimulation()">▶ Play</button>
     <button class="btn red" onclick="pauseSimulation()">⏸ Pause</button>
     <button class="btn olive" onclick="exportPDF()">📄 Export PDF</button>
+
+    <!-- Algorithm Descriptions -->
+    <div class="algo-desc">
+      <h4>Allocation Algorithms</h4>
+      <div class="algo-item"><strong>First Fit</strong>: Scans memory from the beginning and places a process in the first free block that is large enough. Fast, but can cause fragmentation near the start.</div>
+      <div class="algo-item"><strong>Next Fit</strong>: Like First Fit, but resumes searching from the point of the last allocation (reduces repeated scanning of the same early blocks).</div>
+      <div class="algo-item"><strong>Best Fit</strong>: Searches all free blocks and chooses the smallest block that fits the process to minimize wasted space (may leave very small leftover fragments).</div>
+      <div class="algo-item"><strong>Worst Fit</strong>: Allocates in the largest available free block (can leave large leftover regions and reduce some fragmentation scenarios).</div>
+    </div>
+
+    <!-- Process Queue -->
+    <div class="process-queue">
+      <h4>Process Queue</h4>
+      <button class="btn small" onclick="clearQueue()" style="width:auto;padding:6px 10px;margin-top:8px;">Clear Queue</button>
+      <ul id="queue-list" class="queue-list" aria-live="polite"></ul>
+    </div>
   </div>
 
   <!-- ================= RIGHT PANEL ================= -->
@@ -68,8 +90,10 @@
 
     <!-- MEMORY -->
     <div class="memory-panel">
-      <h2>Memory Layout (Total: 10240 KB)</h2>
-      <div id="memory"></div>
+      <h2>Memory Gantt Chart (Total: 10240 KB)</h2>
+      <div id="memory" class="gantt-container" role="img" aria-label="Memory Gantt chart"></div>
+      <div id="memory-ticks" class="memory-ticks" aria-hidden="false"></div>
+      <div id="memory-legend" class="memory-legend" aria-hidden="false" aria-label="Memory legend"></div>
     </div>
 
     <!-- STATS -->
@@ -81,7 +105,7 @@
     <!-- FRAGMENTATION GRAPH -->
     <div class="chart-panel">
       <h2>Fragmentation Over Time</h2>
-      <canvas id="fragChart" height="120"></canvas>
+      <canvas id="fragChart" height="200"></canvas>
     </div>
 
   </div>

@@ -1,16 +1,22 @@
 /* ================================
    HELPER: Allocate Block
 ================================ */
-function allocateBlock(index, pid, size) {
+function allocateBlock(index, pid, size, algo = null) {
   const block = memory[index];
   const remaining = block.size - size;
 
-  // Replace free block with allocated block
+  // Replace free block with allocated block (record algorithm used)
   memory.splice(index, 1, {
     size: size,
     free: false,
-    pid: pid
+    pid: pid,
+    algo: algo
   });
+
+  // notify queue (if present)
+  if (typeof markQueueStatus === 'function') {
+    markQueueStatus(pid, 'allocated', { algo, size });
+  }
 
   // Insert remaining free block if any
   if (remaining > 0) {
@@ -32,7 +38,7 @@ function firstFit(pid, size) {
       highlightBlock(i);
 
       setTimeout(() => {
-        allocateBlock(i, pid, size);
+        allocateBlock(i, pid, size, 'first');
         render();
 
         const stats = calculateStats();
@@ -64,7 +70,7 @@ function nextFit(pid, size) {
       highlightBlock(allocIndex);
 
       setTimeout(() => {
-        allocateBlock(allocIndex, pid, size);
+        allocateBlock(allocIndex, pid, size, 'next');
 
         // ✅ UPDATE lastIndex AFTER allocation
         lastIndex = allocIndex + 1;
@@ -110,7 +116,7 @@ function bestFit(pid, size) {
     highlightBlock(bestIndex);
 
     setTimeout(() => {
-      allocateBlock(bestIndex, pid, size);
+      allocateBlock(bestIndex, pid, size, 'best');
       render();
 
       const stats = calculateStats();
@@ -146,7 +152,7 @@ function worstFit(pid, size) {
     highlightBlock(worstIndex);
 
     setTimeout(() => {
-      allocateBlock(worstIndex, pid, size);
+      allocateBlock(worstIndex, pid, size, 'worst');
       render();
 
       const stats = calculateStats();
