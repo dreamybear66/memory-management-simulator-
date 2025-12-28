@@ -1,19 +1,5 @@
 # 🧠 Memory Management Simulator
 
-<div align="center">
-
-<!-- TODO: Add project logo -->
-
-[![GitHub stars](https://img.shields.io/github/stars/dreamybear66/memory-management-simulator-?style=for-the-badge)](https://github.com/dreamybear66/memory-management-simulator-/stargazers)
-
-[![GitHub forks](https://img.shields.io/github/forks/dreamybear66/memory-management-simulator-?style=for-the-badge)](https://github.com/dreamybear66/memory-management-simulator-/network)
-
-[![GitHub issues](https://img.shields.io/github/issues/dreamybear66/memory-management-simulator-?style=for-the-badge)](https://github.com/dreamybear66/memory-management-simulator-/issues)
-
-[![GitHub license](https://img.shields.io/github/license/dreamybear66/memory-management-simulator-?style=for-the-badge)](LICENSE)
-
-</div>
-
 ## 📖 Overview
 
 This project provides a comprehensive simulation environment designed to help users understand various memory management techniques used in operating systems. It features an interactive web application that visually demonstrates memory allocation, deallocation, and fragmentation, alongside a separate, related implementation in C for core algorithm logic or command-line exploration.
