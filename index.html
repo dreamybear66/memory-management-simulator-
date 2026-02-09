@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Memory Management Simulator</title>
 
   <!-- Styles -->
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/virtual.css" />
 
   <!-- External Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -14,160 +16,261 @@
 
 <body>
 
-<h1 class="project-title">MEMORY MANAGEMENT SIMULATOR</h1>
+  <h1 class="project-title">MEMORY MANAGEMENT SIMULATOR</h1>
 
-<div class="container">
-
-  <!-- ================= LEFT PANEL ================= -->
-  <div class="panel controls">
-    <h2>Controls</h2>
-
-   
-
-    <!-- 🔹 ALGORITHM -->
-    <label>Allocation Algorithm</label>
-    <select id="algorithm" onchange="updateAlgorithmDescription()">
-      <option value="first">First Fit</option>
-      <option value="next">Next Fit</option>
-      <option value="best">Best Fit</option>
-      <option value="worst">Worst Fit</option>
-    </select>
-
-    <!-- 🔹 PROCESS INPUT -->
-    <label>Process ID</label>
-    <input id="pid" placeholder="e.g., P5" />
-
-    <label>Memory Size (KB)</label>
-    <input id="size" type="number" placeholder="e.g., 300" />
-
-    <!-- 🔹 ACTION BUTTONS -->
-    <button class="btn green" onclick="allocateProcess()">Allocate</button>
-    <button class="btn red" onclick="deallocateProcess()">Deallocate</button>
-    <button class="btn blue" onclick="compactMemory()">Compact Memory</button>
-
-    <hr />
-
-    <!-- 🔹 MEMORY SETUP -->
-    <button class="btn green" onclick="loadSampleMemory()">
-      Load Sample Memory
-    </button>
-
-    <button class="btn olive" onclick="resetMemory()">
-      Reset Memory (All Free)
-    </button>
-
-    <hr />
-
-    <!-- 🔹 TOOLS -->
-    <h3>Simulation Tools</h3>
-    <button class="btn blue" onclick="playSimulation()">▶ Play</button>
-    <button class="btn red" onclick="pauseSimulation()">⏸ Pause</button>
-    <button class="btn olive" onclick="exportPDF()">📄 Export PDF</button>
+  <div class="mode-switcher">
+    <button id="mode-contiguous" class="mode-btn active" onclick="switchMode('contiguous')">Contiguous</button>
+    <button id="mode-virtual" class="mode-btn" onclick="switchMode('virtual')">Virtual / Paging</button>
   </div>
 
-  <!-- ================= RIGHT PANEL ================= -->
-  <div class="panel right">
+  <div class="container">
 
-    <!-- MEMORY -->
-    <div class="memory-panel">
-      <h2>Memory Layout (Gantt Chart) - Total: 10240 KB</h2>
-      <div class="gantt-wrapper">
-        <div class="gantt-ruler">
-          <div class="ruler-label">0 KB</div>
-          <div class="ruler-label">2560 KB</div>
-          <div class="ruler-label">5120 KB</div>
-          <div class="ruler-label">7680 KB</div>
-          <div class="ruler-label">10240 KB</div>
+    <!-- ================= LEFT PANEL ================= -->
+    <div class="panel controls">
+      <h2>Controls</h2>
+
+
+
+      <!-- 🔹 ALGORITHM -->
+      <label>Allocation Algorithm</label>
+      <select id="algorithm" onchange="updateAlgorithmDescription()">
+        <option value="first">First Fit</option>
+        <option value="next">Next Fit</option>
+        <option value="best">Best Fit</option>
+        <option value="worst">Worst Fit</option>
+      </select>
+
+      <!-- 🔹 PROCESS INPUT -->
+      <label>Process ID</label>
+      <input id="pid" placeholder="e.g., P5" />
+
+      <label>Memory Size (KB)</label>
+      <input id="size" type="number" placeholder="e.g., 300" />
+
+      <!-- 🔹 ACTION BUTTONS -->
+      <button class="btn green" onclick="allocateProcess()">Allocate</button>
+      <button class="btn red" onclick="deallocateProcess()">Deallocate</button>
+      <button class="btn blue" onclick="compactMemory()">Compact Memory</button>
+
+      <hr />
+
+      <!-- 🔹 MEMORY SETUP -->
+      <button class="btn green" onclick="loadSampleMemory()">
+        Load Sample Memory
+      </button>
+
+      <button class="btn olive" onclick="resetMemory()">
+        Reset Memory (All Free)
+      </button>
+
+      <hr />
+
+      <!-- 🔹 TOOLS -->
+      <h3>Simulation Tools</h3>
+      <button class="btn blue" onclick="playSimulation()">▶ Play</button>
+      <button class="btn red" onclick="pauseSimulation()">⏸ Pause</button>
+      <button class="btn olive" onclick="exportPDF()">📄 Export PDF</button>
+    </div>
+
+    <!-- ================= RIGHT PANEL ================= -->
+    <div class="panel right">
+
+      <!-- MEMORY -->
+      <div class="memory-panel">
+        <h2>Memory Layout (Gantt Chart) - Total: 10240 KB</h2>
+        <div class="gantt-wrapper">
+          <div class="gantt-ruler">
+            <div class="ruler-label">0 KB</div>
+            <div class="ruler-label">2560 KB</div>
+            <div class="ruler-label">5120 KB</div>
+            <div class="ruler-label">7680 KB</div>
+            <div class="ruler-label">10240 KB</div>
+          </div>
+          <div id="memory" class="gantt-chart"></div>
         </div>
-        <div id="memory" class="gantt-chart"></div>
-      </div>
 
-      <!-- LEGEND -->
-      <div class="legend-section">
-        <div class="legend-title">Color Legend:</div>
-        <div class="legend-items">
-          <div class="legend-item">
-            <div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e);"></div>
-            <span>First Fit</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: linear-gradient(135deg, #4a90e2, #6ba3f5);"></div>
-            <span>Next Fit</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: linear-gradient(135deg, #7ed321, #a0e41e);"></div>
-            <span>Best Fit</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: linear-gradient(135deg, #f5a623, #f8b844);"></div>
-            <span>Worst Fit</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: linear-gradient(135deg, #bd10e0, #d946ef);"></div>
-            <span>Preloaded</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #c8cdd0;"></div>
-            <span>Free</span>
+        <!-- LEGEND -->
+        <div class="legend-section">
+          <div class="legend-title">Color Legend:</div>
+          <div class="legend-items">
+            <div class="legend-item">
+              <div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e);"></div>
+              <span>First Fit</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: linear-gradient(135deg, #4a90e2, #6ba3f5);"></div>
+              <span>Next Fit</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: linear-gradient(135deg, #7ed321, #a0e41e);"></div>
+              <span>Best Fit</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: linear-gradient(135deg, #f5a623, #f8b844);"></div>
+              <span>Worst Fit</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: linear-gradient(135deg, #bd10e0, #d946ef);"></div>
+              <span>Preloaded</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background: #c8cdd0;"></div>
+              <span>Free</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ALGORITHM DESCRIPTION -->
-    <div class="algorithm-description-panel">
-      <h3>About Selected Algorithm</h3>
-      <div id="algorithmDescription" class="algorithm-desc-content"></div>
-    </div>
+      <!-- ALGORITHM DESCRIPTION -->
+      <div class="algorithm-description-panel">
+        <h3>About Selected Algorithm</h3>
+        <div id="algorithmDescription" class="algorithm-desc-content"></div>
+      </div>
 
-    <!-- COMPARE TAB -->
-    <div class="compare-tab-panel">
-      <h2>Compare Process Allocations</h2>
-      <div class="compare-tab-content">
-        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Enter Process ID to Compare:</label>
-        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-          <input id="compareProcessId" type="text" placeholder="e.g., P1" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
-          <button class="btn blue" onclick="compareProcessAlgorithms()" style="flex: 0 0 auto; width: 100px; margin-top: 0;">Compare</button>
+      <!-- COMPARE TAB -->
+      <div class="compare-tab-panel">
+        <h2>Compare Process Allocations</h2>
+        <div class="compare-tab-content">
+          <label style="display: block; margin-bottom: 8px; font-weight: bold;">Enter Process ID to Compare:</label>
+          <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+            <input id="compareProcessId" type="text" placeholder="e.g., P1"
+              style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
+            <button class="btn blue" onclick="compareProcessAlgorithms()"
+              style="flex: 0 0 auto; width: 100px; margin-top: 0;">Compare</button>
+          </div>
+          <div id="compareTableContainer"></div>
         </div>
-        <div id="compareTableContainer"></div>
       </div>
-    </div>
 
-    <!-- EFFICIENCY COMPARISON -->
-    <div class="efficiency-panel" id="efficiencyPanel" style="display: none;">
-      <h2>Algorithm Efficiency Comparison</h2>
-      <div class="efficiency-content">
-        <div class="efficiency-grid" id="efficiencyGrid"></div>
+      <!-- EFFICIENCY COMPARISON -->
+      <div class="efficiency-panel" id="efficiencyPanel" style="display: none;">
+        <h2>Algorithm Efficiency Comparison</h2>
+        <div class="efficiency-content">
+          <div class="efficiency-grid" id="efficiencyGrid"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- STATS -->
-    <div class="stats-panel">
-      <h2>Statistics</h2>
-      <div class="stats-grid" id="stats"></div>
-    </div>
+      <!-- STATS -->
+      <div class="stats-panel">
+        <h2>Statistics</h2>
+        <div class="stats-grid" id="stats"></div>
+      </div>
 
-    <!-- FRAGMENTATION GRAPH -->
-    <div class="chart-panel">
-      <h2>Fragmentation Over Time</h2>
-      <canvas id="fragChart" height="120"></canvas>
+      <!-- FRAGMENTATION GRAPH -->
+      <div class="chart-panel">
+        <h2>Fragmentation Over Time</h2>
+        <canvas id="fragChart" height="120"></canvas>
+      </div>
+
     </div>
 
   </div>
 
-</div>
+  <!-- ================= VIRTUAL MEMORY VIEW ================= -->
+  <div id="virtual-memory-view" class="virtual-container" style="display: none;">
 
-<!-- ================= SCRIPTS ================= -->
-<script src="js/memory.js"></script>
-<script src="js/algorithms.js"></script>
-<script src="js/operations.js"></script>
-<script src="js/stats.js"></script>
-<script src="js/charts.js"></script>
-<script src="js/playback.js"></script>
-<script src="js/export.js"></script>
-<script src="js/compare.js"></script>
-<script src="js/ui.js"></script>
+    <!-- CONTROLS & HUD -->
+    <div class="vm-hud-panel">
+      <div class="hud-header">
+        <h2>VIRTUAL MEMORY UNIT</h2>
+        <div class="vm-stats">
+          <div class="vm-stat-box">
+            <span class="vm-stat-label">HIT RATE</span>
+            <span id="vm-hit-rate" class="vm-stat-value">0%</span>
+          </div>
+          <div class="vm-stat-box">
+            <span class="vm-stat-label">FAULTS</span>
+            <span id="vm-fault-count" class="vm-stat-value error-text">0</span>
+          </div>
+        </div>
+      </div>
 
+      <div class="vm-controls">
+        <div class="vm-input-group">
+          <label>LOGICAL ADDRESS (Hex)</label>
+          <input type="text" id="vm-address-input" placeholder="0x..." maxlength="6">
+        </div>
+        <button id="vm-access-btn" class="vm-btn-primary">ACCESS MEMORY</button>
+
+        <div class="vm-input-group">
+          <label>REPLACEMENT ALGO</label>
+          <select id="vm-algo-select">
+            <option value="FIFO">FIFO</option>
+            <option value="LRU">LRU</option>
+            <option value="Optimal">Optimal</option>
+            <option value="Clock">Clock</option>
+          </select>
+        </div>
+        <button id="vm-reset-btn" class="vm-btn-warning">SYSTEM RESET</button>
+      </div>
+
+      <div id="vm-log-console" class="vm-log-console">
+        <div class="log-entry">System ready...</div>
+      </div>
+    </div>
+
+    <!-- VISUALIZATION AREA -->
+    <div class="vm-vis-area">
+
+      <!-- LOGICAL SPACE (Source) -->
+      <div class="vis-component" id="vis-logical">
+        <h3>LOGICAL CPU</h3>
+        <div class="cpu-icon">CPU</div>
+        <div class="address-bus-start"></div>
+      </div>
+
+      <!-- TLB -->
+      <div class="vis-component" id="vis-tlb">
+        <h3>TLB CACHE</h3>
+        <div id="tlb-grid" class="tlb-grid">
+          <!-- TLB Entries injected here -->
+        </div>
+      </div>
+
+      <!-- PAGE TABLE -->
+      <div class="vis-component" id="vis-pt">
+        <h3>PAGE TABLE</h3>
+        <div id="pt-list" class="pt-list">
+          <!-- Page Table Entries -->
+        </div>
+      </div>
+
+      <!-- PHYSICAL MEMORY -->
+      <div class="vis-component" id="vis-ram">
+        <h3>PHYSICAL RAM</h3>
+        <div id="ram-grid" class="ram-grid">
+          <!-- RAM Frames -->
+        </div>
+      </div>
+
+      <!-- DISK (Backing Store) -->
+      <div class="vis-component" id="vis-disk">
+        <h3>VIRTUAL DISK</h3>
+        <div class="disk-icon">DISK</div>
+      </div>
+
+    </div>
+
+    <!-- ANIMATION LAYER (Overlay) -->
+    <div id="vm-animation-layer"></div>
+
+  </div>
+
+  <!-- ================= SCRIPTS ================= -->
+  <script src="js/memory.js"></script>
+  <script src="js/algorithms.js"></script>
+  <script src="js/operations.js"></script>
+  <script src="js/stats.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/playback.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/ui.js"></script>
+
+  <!-- New Virtual Memory Scripts -->
+  <script src="js/virtual-memory.js"></script>
+  <script src="js/ui-virtual.js"></script>
 
 </body>
+
 </html>
